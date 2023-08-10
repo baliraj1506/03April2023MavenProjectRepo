@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.Select;
 
 public class AddNewCustomerPage {
 
@@ -49,6 +50,9 @@ public class AddNewCustomerPage {
 
 	By btnSave=By.xpath("//button[@name='save']");
 	
+	@FindBy(xpath = "//*[@id='VendorId']")
+	WebElement dropdownVendorMgr;
+	
 	//methods
 	
 		public String getPageTitle() {
@@ -90,6 +94,18 @@ public class AddNewCustomerPage {
 			}else {
 				ldriver.findElement(rdFemaleGender).click();
 			}
+		}
+		
+		public void enterDob(String dob)
+		{
+			ldriver.findElement(txtDob).sendKeys(dob);
+
+       }
+		
+		public void enterManagerOfVendor(String value)
+		{
+			Select drp=new Select(dropdownVendorMgr);
+			drp.selectByVisibleText(value);
 		}
 		
 		public void SetCompanyName(String comName) {

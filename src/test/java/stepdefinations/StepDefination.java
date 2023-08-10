@@ -1,10 +1,22 @@
 package stepdefinations;
 
+import java.io.File;
+import java.io.IOException;
+
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.By;
+import org.openqa.selenium.OutputType;
+import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.testng.Assert;
 
+import Utitlities.ReadConfig;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -13,17 +25,35 @@ import pageObject.AdminPage;
 import pageObject.Vendor;
 
 public class StepDefination extends Base {
+    
+	@Before
+	public void setup() throws Exception {
 
+		readConfig = new ReadConfig();
+
+		System.out.println("setUp method executed");
+		// driver = new ChromeDriver();
+
+		String browser = readConfig.getBrowser();
+		Thread.sleep(2000);
+		// launch browser
+		if (browser.equalsIgnoreCase("Chrome")) {
+			driver = new ChromeDriver();
+		} else if (browser.equalsIgnoreCase("FireFox")) {
+			driver = new FirefoxDriver();
+		} else if (browser.equalsIgnoreCase("IE")) {
+			driver = new InternetExplorerDriver();
+			
+		}
+
+	}
+	
+	
 	@Given("User Lanch Chrome Browser")
 	public void user_lanch_chrome_browser() {
-//	    System.setProperty("webdriver.chrome.driver","D:\\QE15_Software\\ChromeDriver_114\\chromedriver_win32\\chromedriver.exe");
-//	
-//	    driver=new ChromeDriver();
-		
-		ChromeOptions chromeOptions = new ChromeOptions();
-		chromeOptions.addArguments("--remote-allow-origins=*","ignore-certificate-errors");
 
-		driver = new ChromeDriver(chromeOptions);
+		
+		
 	    
 	    ad=new AdminPage(driver);//When obj creation is going on constructor called concurentlly,to initialize the instance variable or global
 	    
@@ -45,19 +75,11 @@ public class StepDefination extends Base {
 		ad.setPassword(password);
 		Thread.sleep(2000);
 	}
-
 	@When("User click on Login button")
 	public void user_click_on_login_button() throws Exception {
 	   
 		ad.clickLogin();
 		Thread.sleep(2000);
-
-	}
-
-	@Then("Page title should be {string}")
-	public void page_title_should_be(String string) {
-	  
-		
 	}
 	
 	@Then("User verify page title should be {string}")
@@ -114,6 +136,8 @@ public class StepDefination extends Base {
 				  addCust.SetFirstName(firstName);
 				  addCust.SetLastName(lastName);
 				  addCust.SetGender(gender);
+				//  addCust.enterDob("6/13/1988");
+				//  addCust.enterManagerOfVendor("Vendor 1");
 				  addCust.SetCompanyName(compName);
 				  addCust.SetAdminContent(adminComment);
 				    Thread.sleep(2000);
@@ -156,6 +180,33 @@ public class StepDefination extends Base {
 			public void user_click_on_search_button() throws Exception {
 				vendor.clickOnSearchButton();
 			    Thread.sleep(2000);
+			}
+			
+			@After
+			public void tearDown(Scenario sc) {
+
+				System.out.println("Tear down method executed..");
+
+				if (sc.isFailed() == true) {
+					// Convert web driver object to TakeScreenshot
+					String fileWithPath = "C:\\Users\\Prashant\\eclipse-workspace\\01May2023CucumberMavenProject\\Screenshot\\failedScreenshot.png";
+					TakesScreenshot scrShot = ((TakesScreenshot) driver);
+					// Call getScreenshotAs method to create image file
+					File SrcFile = scrShot.getScreenshotAs(OutputType.FILE);
+
+					// Move image file to new destination
+					File DestFile = new File(fileWithPath);
+
+					// Copy file at destination
+					try {
+						FileUtils.copyFile(SrcFile, DestFile);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				driver.quit();
 			}
 			
 }
